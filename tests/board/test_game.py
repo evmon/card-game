@@ -17,10 +17,14 @@ class TestGame():
     def test_get_form(self, client):
         """GET / returns the form with input fields for game."""
         response = client.get(reverse('game'))
-        # print(dir(response))
-        print(response.content)
-        # print(response.context)
-        # assert response.status_code == status.HTTP_200_OK
+        content = response.content
+
+        assert response.status_code == 200
+        assert '<label for="id_player_count">' in str(content)
+        assert '<label for="id_square_count">' in str(content)
+        assert '<label for="id_card_count">' in str(content)
+        assert '<label for="id_colors">' in str(content)
+        assert '<label for="id_cards">' in str(content)
 
 
 @pytest.mark.parametrize('player_count, square_count, card_count, colors, \

@@ -6,13 +6,13 @@ class GameInputForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['player_count'].label = "Number​ of​ Players"
+        self.fields['player_count'].label = "Number of Players"
         self.fields['square_count'].label = \
-            "Number of​ Squares​ on​ the​ board"
-        self.fields['card_count'].label = "Number​ of​ Cards​ in​ the​ deck"
+            "Number of Squares on the board"
+        self.fields['card_count'].label = "Number of Cards in the deck"
         self.fields['colors'].label = \
-            "Sequence​ of​ characters on​ the​ board"
-        self.fields['cards'].label = "Cards​ in​ the​ deck"\
+            "Sequence of characters on the board"
+        self.fields['cards'].label = "Cards in the deck"
 
     player_count = forms.IntegerField(min_value=1, max_value=4)
     square_count = forms.IntegerField(min_value=1, max_value=79)
