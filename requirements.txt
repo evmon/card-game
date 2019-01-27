@@ -1,0 +1,6 @@
+Django>=2.0
+psycopg2-binary
+pytest
+pytest-django
+requests
+requests_mock
