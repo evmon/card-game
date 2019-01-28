@@ -34,7 +34,7 @@ class TestGame():
     def test_get_game_result_1(self, client):
         """POST / returns game result.
         Input parapeters:
-            player_count: 3,
+            player_count: 2,
             square_count: 13,
             card_count: 8,
             colors: "RYGPBRYGBRPOP",
@@ -50,7 +50,142 @@ class TestGame():
         response = client.post(reverse('game'), data=data)
 
         expected_result_data = {
-            'result': "Player 1 won after 7 cards.",
+            'message': "Player 1 won after 7 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_2(self, client):
+        """POST / returns game result.
+        Input parapeters:
+            player_count: 4,
+            square_count: 13,
+            card_count: 8,
+            colors: "RYGPBRYGBRPOP",
+            cards: "R,B,GG,Y,P,B,P,RR".
+        """
+        data = {
+            'player_count': 4,
+            'square_count': 13,
+            'card_count': 8,
+            'colors': "RYGPBRYGBRPOP",
+            'cards': "R,B,GG,Y,P,B,P,RR"
+        }
+        response = client.post(reverse('game'), data=data)
+
+        expected_result_data = {
+            'message': "No player won after 8 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_3(self, client):
+        """POST / returns game result.
+        Input parapeters:
+            player_count: 3,
+            square_count: 13,
+            card_count: 8,
+            colors: "RYGPBRYGBRPOP",
+            cards: "R,B,GG,Y,P,B,P,RR".
+        """
+        data = {
+            'player_count': 3,
+            'square_count': 13,
+            'card_count': 8,
+            'colors': "RYGPBRYGBRPOP",
+            'cards': "R,B,GG,Y,P,B,P,RR"
+        }
+        response = client.post(reverse('game'), data=data)
+
+        expected_result_data = {
+            'message': "Player 2 won after 8 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_4(self, client):
+        """POST / returns game result.
+        Input parapeters:
+            player_count: 2,
+            square_count: 6,
+            card_count: 5,
+            colors: "RYGRYB",
+            cards: "R,YY,G,G".
+        """
+        data = {
+            'player_count': 2,
+            'square_count': 6,
+            'card_count': 5,
+            'colors': "RYGRYB",
+            'cards': "R,YY,G,G,B",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "Player 2 won after 4 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_5(self, client):
+        """POST / returns game result.
+        Input parapeters:
+            player_count: 3,
+            square_count: 9,
+            card_count: 6,
+            colors: "QQQQQQQQQ",
+            cards: "Q,QQ,Q,Q,QQ,Q".
+        """
+        data = {
+            'player_count': 3,
+            'square_count': 9,
+            'card_count': 6,
+            'colors': "QQQQQQQQQ",
+            'cards': "Q,QQ,Q,Q,QQ,Q",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "No player won after 6 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_6(self, client):
+        """POST / returns game result."""
+        data = {
+            'player_count': 3,
+            'square_count': 79,
+            'card_count': 10,
+            'colors': "ABCDEFGHIJKLMNOPQRSTUVWXYABCDEFGHIJKLMNOPQRSTUVWXYABCDEFGHIJKLMNOPQRSTUVWXYABCD",
+            'cards': "D,BB,CC,E,A,BB,EE,DD,CC,AA",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "Player 2 won after 8 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_7(self, client):
+        """POST / returns game result."""
+        data = {
+            'player_count': 1,
+            'square_count': 10,
+            'card_count': 5,
+            'colors': "ABCDEABCDE",
+            'cards': "A,B,A,BB,E",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "Player 1 won after 5 cards.",
+        }
+        assert response.json() == expected_result_data
+
+    def test_get_game_result_8(self, client):
+        """POST / returns game result."""
+        data = {
+            'player_count': 4,
+            'square_count': 1,
+            'card_count': 1,
+            'colors': "Z",
+            'cards': "X",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "Player 1 won after 1 cards.",
         }
         assert response.json() == expected_result_data
 

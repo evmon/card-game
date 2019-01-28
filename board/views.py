@@ -1,21 +1,31 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from django.views.generic import FormView
 
 from .forms import GameInputForm
 from .models import GameResult
 
 
-class PlayerInfo(object):
+class PlayerInfo():
+    # current information about player
     piece = 0
-    # current_board = ""
 
-def response_message(status, player, total_cards):
+
+def create_game_result(result):
+    # game resuld save to the database
+    GameResult.objects.create(info=result)
+
+
+def response_message(status, *args, **kwargs):
     if status:
+        [player, total_cards] = args
         msg = "Player {} won after {} cards."
-        return JsonResponse({'message': msg.format(player + 1, total_cards)})
+        create_game_result(msg)
+        return JsonResponse({
+            'message': msg.format(player + 1, total_cards)})
     else:
-        msg = "No one wins after exhausting the deck of {} cards."
+        [total_cards] = args
+        msg = "No player won after {} cards."
+        create_game_result(msg)
         return JsonResponse({'message': msg.format(total_cards)})
 
 
@@ -39,11 +49,9 @@ def game(request):
             player_count = int(request.POST['player_count'])
             square_count = int(request.POST['square_count'])
             card_count = int(request.POST['card_count'])
-            colors = request.POST['colors']
-            # index of last square
-            last_square = colors.rfind(colors[-1])
-
+            colors = request.POST['colors'].upper()
             cards = request.POST['cards'].upper().split(",")
+            last_square = colors.rfind(colors[-1]) # index of last square
             player_info = []
             total_cards = 0 # initial number of cards drawn
             player = 0 # player with number 1 goes first
@@ -59,25 +67,24 @@ def game(request):
                 symbol_count = card.count(card[0])
 
                 # if 1 characters in card and color in the board doesn't exist
-                if symbol_count == 1 and \
-                    not (card in colors[player_info[player].piece+1:]):
+                if not (card[0] in colors[player_info[player].piece:]):
                     return response_message(True, player, total_cards)
-
                 for index_color, color in enumerate(colors):
                     if index_color >= player_info[player].piece:
 
                         # the current color matches the card symbol
                         if color == card[symbol_count-1]:
-                            player_info[player].piece = index_color + 1
                             if index_color == last_square:
                                 return response_message(True, player, total_cards)
-                            symbol_count = symbol_count - 1
-                            if symbol_count == 0:
-                                break
+                            else:
+                                player_info[player].piece = index_color + 1
+                                symbol_count = symbol_count - 1
+                                if symbol_count == 0:
+                                    break
                 # move to the next player
                 player = player + 1
             else:
-                return response_message(False, player, total_cards)
+                return response_message(False, total_cards)
     else:
         form = GameInputForm()
     return render(request, 'board/form.html', {'form': form})
