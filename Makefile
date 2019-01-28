@@ -32,6 +32,6 @@ db-sh:
 freeze:
 	@$(TOOLS) pip3 freeze
 
-test:
+test-all:
 	@$(DOCKER_COMPOSE) build web
 	@$(TOOLS) py.test -sx
