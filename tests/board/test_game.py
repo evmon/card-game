@@ -9,8 +9,14 @@ from board.forms import GameInputForm
 @pytest.mark.django_db
 class TestGame():
     """Tests for game endpoint.
-    get: the form with input fields for game.
-    post: finding a winner player.
+    GET: the form with input fields for game.
+    POST: determine the winner player.
+    Input parapeters:
+        player_count: Number of Players,
+        square_count: Number of Squares on the board,
+        card_count: Number of Cards in the deck,
+        colors: Sequence of characters on the board,
+        cards: Cards in the deck.
     """
    
     def test_get_form(self, client):
@@ -24,6 +30,29 @@ class TestGame():
         assert '<label for="id_card_count">' in str(content)
         assert '<label for="id_colors">' in str(content)
         assert '<label for="id_cards">' in str(content)
+
+    def test_get_game_result_1(self, client):
+        """POST / returns game result.
+        Input parapeters:
+            player_count: 3,
+            square_count: 13,
+            card_count: 8,
+            colors: "RYGPBRYGBRPOP",
+            cards: "R,B,GG,Y,P,B,P,RR".
+        """
+        data = {
+            'player_count': 2,
+            'square_count': 13,
+            'card_count': 8,
+            'colors': "RYGPBRYGBRPOP",
+            'cards': "R,B,GG,Y,P,B,P,RR"
+        }
+        response = client.post(reverse('game'), data=data)
+
+        expected_result_data = {
+            'result': "Player 1 won after 7 cards.",
+        }
+        assert response.json() == expected_result_data
 
 
 @pytest.mark.parametrize('player_count, square_count, card_count, colors, \
