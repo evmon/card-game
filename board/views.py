@@ -63,7 +63,8 @@ def game(request):
                 if player == player_count: player = 0
                 symbol_count = card.count(card[0])
 
-                # # if first characters in card and color in the current board doesn't exist
+                # if first characters in card and color 
+                # in the current board doesn't exist
                 if not (card[0] in colors[player_info[player].piece:]):
                     return response_message(True, player, total_cards)
                 for index_color, color in enumerate(colors):
