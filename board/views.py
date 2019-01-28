@@ -63,25 +63,25 @@ def game(request):
                 if player == player_count: player = 0
                 symbol_count = card.count(card[0])
 
-                # # if first characters in card and color in the board doesn't exist
+                # # if first characters in card and color in the current board doesn't exist
                 if not (card[0] in colors[player_info[player].piece:]):
                     return response_message(True, player, total_cards)
                 for index_color, color in enumerate(colors):
-                    if index_color >= player_info[player].piece:
-                        # the current color matches the card symbol
-                        if color == card[symbol_count-1]:
-                            if index_color == last_square:
-                                return response_message(True, player, total_cards)
-                            else:
-                                player_info[player].piece = index_color + 1
-                                symbol_count = symbol_count - 1
-                                if symbol_count == 0:
-                                    break
-                                else:
-                                    # if first characters in card and color
-                                    # in the board doesn't exist
-                                    if not (card[0] in colors[player_info[player].piece:]):
-                                        return response_message(True, player, total_cards)
+                    if (index_color >= player_info[player].piece and
+                        color == card[symbol_count-1]):
+                        if index_color == last_square:
+                            return response_message(
+                                True, player, total_cards)
+                        else:
+                            player_info[player].piece = index_color + 1
+                            symbol_count = symbol_count - 1
+                            if symbol_count != 0:
+                                # if first characters in card and color
+                                # in the updated board doesn't exist
+                                if not (card[0] in colors[index_color + 1:]):
+                                    return response_message(
+                                        True, player, total_cards)
+                            else: break
                 # move to the next player
                 player = player + 1
             else:
