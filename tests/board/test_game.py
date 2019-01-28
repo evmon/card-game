@@ -4,6 +4,25 @@ import pytest
 from django.urls import reverse
 
 from board.forms import GameInputForm
+from board.models import GameResult
+
+
+class EqualsInteger:
+    """Helper to check that the value compare to is integer.
+
+    For example,
+
+    def test_compare_dicts():
+        assert {
+            'userName':'bob',
+            'id': 2004
+        } == {
+            'userName': 'bob',
+            'lastModified': EqualsInteger()
+        }
+    """
+    def __eq__(self, other):
+        return type(other) == int
 
 
 @pytest.mark.django_db
@@ -30,6 +49,44 @@ class TestGame():
         assert '<label for="id_card_count">' in str(content)
         assert '<label for="id_colors">' in str(content)
         assert '<label for="id_cards">' in str(content)
+
+    def test_save_game_result(self, client):
+        """POST / returns game result and checked GameResult object.
+        The GameResult objects should be created.
+        """
+        assert GameResult.objects.all().count() == 0
+        data = {
+            'player_count': 2,
+            'square_count': 13,
+            'card_count': 8,
+            'colors': "RYGPBRYGBRPOP",
+            'cards': "R,B,GG,Y,P,B,P,RR"
+        }
+        response = client.post(reverse('game'), data=data)
+        assert GameResult.objects.all().count() == 1
+        msg = "Player 1 won after 7 cards."
+        expected_result_data = {
+            'message': msg,
+        }
+        assert GameResult.objects.first().info == msg
+        assert GameResult.objects.first().id == EqualsInteger()
+        assert response.json() == expected_result_data
+        data = {
+            'player_count': 4,
+            'square_count': 13,
+            'card_count': 8,
+            'colors': "RYGPBRYGBRPOP",
+            'cards': "R,B,GG,Y,P,B,P,RR"
+        }
+        response = client.post(reverse('game'), data=data)
+        assert GameResult.objects.all().count() == 2
+        msg = "No player won after 8 cards."
+        expected_result_data = {
+            'message': msg,
+        }
+        assert response.json() == expected_result_data
+        assert GameResult.objects.first().info == msg
+        assert GameResult.objects.first().id == EqualsInteger()
 
     def test_get_game_result_1(self, client):
         """POST / returns game result.
@@ -170,7 +227,7 @@ class TestGame():
         }
         response = client.post(reverse('game'), data=data)
         expected_result_data = {
-            'message': "Player 1 won after 5 cards.",
+            'message': "Player 1 won after 4 cards.",
         }
         assert response.json() == expected_result_data
 
@@ -189,11 +246,27 @@ class TestGame():
         }
         assert response.json() == expected_result_data
 
+    def test_get_game_result_9(self, client):
+        """POST / returns game result."""
+        data = {
+            'player_count': 2,
+            'square_count': 2,
+            'card_count': 2,
+            'colors': "AV",
+            'cards': "AA,B",
+        }
+        response = client.post(reverse('game'), data=data)
+        expected_result_data = {
+            'message': "Player 1 won after 1 cards.",
+        }
+        assert response.json() == expected_result_data
+
 
 @pytest.mark.parametrize('player_count, square_count, card_count, colors, \
     cards, validity',
     [
         (2, 9, 4, 'AVHFISKSH', 'A,VV,F,S', True),
+        (2, 9, 4, 'AVHFIghSH', 'A,VV,F,S', True),
         (2, 9, 4, 'AVHFISKSH', 'A,VB,F,S', False),
         (5, 9, 4, 'AVHFISKSH', 'A,VV,F,S', False),
         (4, 99, 4, 'AVHFISKSH', 'A,VV,F,S', False),
